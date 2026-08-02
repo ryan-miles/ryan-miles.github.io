@@ -138,7 +138,7 @@
   /* ---------- index ---------- */
   .index { margin:14px 0 0; border-top:1px solid var(--line); }
   .entry {
-    display:grid; grid-template-columns:150px 1fr; gap:0 28px;
+    display:grid; grid-template-columns:160px 1fr; gap:0 28px;
     padding:26px 16px 26px 12px; border-bottom:1px solid var(--line);
     position:relative;
   }
@@ -223,14 +223,13 @@
   <section class="masthead">
     <h1 class="name">Ryan&nbsp;Miles</h1>
     <p class="role">
-      <strong>Program manager and doctoral researcher.</strong>
+      <strong>Technical Leader and Coctoral Researcher.</strong>
       I build and study systems where sensitive data has to move between parties who do not fully trust each other. Encrypted inference, zero trust architecture, and the metadata problem nobody budgets for.
     </p>
     <nav class="contact" aria-label="Contact and profiles">
       <a href="https://github.com/ryan-miles">GitHub</a>
-      <a href="https://www.linkedin.com/in/">LinkedIn</a>
-      <a href="https://scholar.google.com/">Scholar</a>
-      <a href="mailto:you@example.com">Email</a>
+      <a href="https://www.linkedin.com/in/ryanmilespro/">LinkedIn</a>
+      <a href="mailto:rmiles.pro@gmail.com">Email</a>
     </nav>
 
     <div class="channel" id="channel" aria-hidden="true"></div>
@@ -240,7 +239,7 @@
   <section class="now">
     <h2 class="mono">Now</h2>
     <p id="now-text">
-      Finishing the IronCLAD prospectus and building the evaluation harness for encrypted inference latency. Reading on traffic analysis defenses and their real cost in bandwidth. Open to conversations about privacy-preserving architecture in regulated and classified environments.
+      Standing up the feasibility testbed behind my dissertation and writing up the parts of it worth explaining in plain language. Reading on traffic analysis defenses and what they cost in bandwidth and latency. Open to conversations about privacy-preserving architecture in regulated and controlled environments.
     </p>
   </section>
 
@@ -301,28 +300,18 @@ const CONFIG = {
 const ENTRIES = [
   {
     id: "ironclad",
-    title: "IronCLAD: privacy-preserving inspection for the defense industrial base",
-    year: 2026,
+    title: "Secure distributed computation in zero-trust manufacturing networks",
+    date: "2026",
     kind: "research",
     status: "active",
-    blurb: "Doctoral research on a three-layer architecture: quality-inspection inference over encrypted data, telemetry aggregation under a differential privacy budget, and timing and metadata protection at the network layer. The network layer is the primary contribution, because padding and cover traffic are where the real cost lands.",
-    tags: ["homomorphic-encryption", "differential-privacy", "confidential-computing", "manufacturing"],
-    links: [{ label: "Prospectus on request", href: "mailto:you@example.com" }]
-  },
-  {
-    id: "timing-privacy",
-    title: "What constant-rate channels actually cost",
-    year: 2026,
-    kind: "note",
-    status: "draft",
-    blurb: "Traffic analysis defenses get described as solved and priced as free. Working notes on the bandwidth and latency bill for padding schemes, and where the tradeoff breaks down in bandwidth-constrained tactical networks.",
-    tags: ["traffic-analysis", "network-security", "formal-methods"],
-    links: []
+    blurb: "My doctoral work at Purdue. A privacy-preserving architecture for defense industrial base inspection workflows, built around three layers: encrypted acceptance testing, telemetry aggregation under a stated privacy bound, and transport hardened against timing and volume correlation. Proposed defense November 2027.",
+    tags: ["zero-trust", "applied-cryptography", "manufacturing", "dissertation"],
+    links: [{ label: "Ask me about it", href: "mailto:rmiles.pro@gmail.com" }]
   },
   {
     id: "ai-decision-support",
     title: "AI in intelligence decision support: a qualitative study",
-    year: 2026,
+    date: "2026-06",
     kind: "research",
     status: "active",
     blurb: "Interview-based study of how analysts and operators absorb AI assistance into existing decision workflows, what they trust, and what they quietly route around.",
@@ -330,23 +319,73 @@ const ENTRIES = [
     links: []
   },
   {
-    id: "zero-trust",
-    title: "Zero trust past the marketing",
-    year: 2025,
+    id: "post-2026-07",
+    title: "A deliberately vague answer still has to be useful",
+    date: "2026-07",
     kind: "writing",
-    status: "draft",
-    blurb: "Zero trust became a procurement checkbox before it became an architecture. An attempt to separate the parts with real engineering content from the parts sold by the slide.",
-    tags: ["zero-trust", "architecture"],
+    status: "published",
+    blurb: "Protecting the acceptance logic means an operator sees a coarse result instead of a number. Coarse is not the same as unhelpful. Notes on designing the small vocabulary of answers a person on the floor acts on, and on testing whether they act on it correctly.",
+    tags: ["interpretability", "human-factors"],
     links: []
   },
   {
-    id: "vpx-sosa",
-    title: "Reading notes: VPX, SOSA, and modular open systems",
-    year: 2025,
-    kind: "note",
-    status: "active",
-    blurb: "Running notes on the tactical backplane ecosystem, how the standards stack fits together, and what modularity buys once integration cost is counted honestly.",
-    tags: ["hardware", "open-standards"],
+    id: "post-2026-06",
+    title: "Trusted hardware is an anchor, not an answer",
+    date: "2026-06",
+    kind: "writing",
+    status: "published",
+    blurb: "Enclaves narrow the set of parties who observe your computation. They do not remove observation, and the attack surface they retire depends entirely on which platform you pick. What the trust assumption buys, and what stays on your plate.",
+    tags: ["confidential-computing", "threat-modeling"],
+    links: []
+  },
+  {
+    id: "post-2026-05",
+    title: "The bill for hiding a pattern",
+    date: "2026-05",
+    kind: "writing",
+    status: "published",
+    blurb: "Constant-rate transport is easy to describe and expensive to run. Every site ships on a fixed cadence whether or not it has anything to say. Notes on the bandwidth and latency you trade for a flat signal, and on which control loops survive the trade.",
+    tags: ["network-security", "latency"],
+    links: []
+  },
+  {
+    id: "post-2026-04",
+    title: "Encryption hides the payload, not the pattern",
+    date: "2026-04",
+    kind: "writing",
+    status: "published",
+    blurb: "Traffic analysis reads production tempo, downtime, and retooling events from timing and volume alone, with every packet encrypted end to end. In a supply chain, the pattern is the intelligence. Why metadata deserves its own line in the threat model.",
+    tags: ["traffic-analysis", "metadata-privacy"],
+    links: []
+  },
+  {
+    id: "post-2026-03",
+    title: "Averages that protect the sites underneath them",
+    date: "2026-03",
+    kind: "writing",
+    status: "published",
+    blurb: "An enterprise wants yield trends across every site. No site wants its own numbers legible inside the average. Differential privacy gives you a dial between those two positions. Notes on what the dial controls and what it costs you in usable signal.",
+    tags: ["differential-privacy", "telemetry"],
+    links: []
+  },
+  {
+    id: "post-2026-02",
+    title: "Computing on data you never decrypt",
+    date: "2026-02",
+    kind: "writing",
+    status: "published",
+    blurb: "A walk through homomorphic encryption for people who do not want the math. What it costs, why a pass-fail acceptance test happens to be a friendly workload for it, and why the hard part is the latency budget rather than the feasibility.",
+    tags: ["applied-cryptography", "encrypted-inference"],
+    links: []
+  },
+  {
+    id: "post-2026-01",
+    title: "The supplier runs the check without learning the rule",
+    date: "2026-01",
+    kind: "writing",
+    status: "published",
+    blurb: "Most security architecture assumes the edge protects its data from the cloud. Defense manufacturing inverts the direction. A machine shop is authorized to verify a part and denied the tolerance logic it verifies against. Everything else in my research follows from taking the inversion seriously.",
+    tags: ["zero-trust", "asymmetric-trust"],
     links: []
   }
 ];
@@ -354,6 +393,19 @@ const ENTRIES = [
 /* ===================== nothing below needs editing ===================== */
 
 const KIND_ORDER = ["research", "writing", "project", "note", "talk"];
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+/* date accepts "2026", "2026-03", or "2026-03-14" */
+function dateKey(e) {
+  const d = String(e.date || e.year || "");
+  const [y, m, day] = d.split("-");
+  return `${y || "0000"}-${m || "12"}-${day || "31"}`;
+}
+function dateLabel(e) {
+  const d = String(e.date || e.year || "");
+  const [y, m] = d.split("-");
+  return m ? `${MONTHS[Number(m) - 1]} ${y}` : y;
+}
 const state = { q: "", kind: "all", tag: "", sort: "new" };
 let data = ENTRIES;
 
@@ -421,13 +473,14 @@ function visible() {
     .filter((e) => !state.tag || (e.tags || []).includes(state.tag))
     .filter((e) => {
       if (!q) return true;
-      const hay = [e.title, e.blurb, e.kind, e.status, (e.tags || []).join(" ")].join(" ").toLowerCase();
+      const hay = [e.title, e.blurb, e.kind, e.status, dateLabel(e), (e.tags || []).join(" ")].join(" ").toLowerCase();
       return q.split(/\s+/).every((w) => hay.includes(w));
     })
     .sort((a, b) => {
       if (state.sort === "az") return a.title.localeCompare(b.title);
-      if (state.sort === "old") return a.year - b.year || a.title.localeCompare(b.title);
-      return b.year - a.year || a.title.localeCompare(b.title);
+      const ka = dateKey(a), kb = dateKey(b);
+      if (state.sort === "old") return ka.localeCompare(kb) || a.title.localeCompare(b.title);
+      return kb.localeCompare(ka) || a.title.localeCompare(b.title);
     });
 }
 
@@ -462,7 +515,7 @@ function renderIndex() {
   $("#index").innerHTML = rows.map((e) => `
     <article class="entry" id="${esc(e.id)}">
       <div class="rail">
-        <span class="year">${esc(e.year)}</span>
+        <span class="year">${esc(dateLabel(e))}</span>
         <span class="kind">${esc(e.kind)}</span>
         <span class="status" data-status="${esc(e.status)}"><i class="dot"></i>${esc(e.status)}</span>
       </div>
