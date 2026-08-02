@@ -1,3 +1,10 @@
+# Local-only notes. Everything committed here is public — GitHub renders it on
+# the repo page, and legacy Pages serves it at ryan-miles.github.io/<file> too.
+# Keep workflow and machine notes in ~/Developer/WORKFLOW.md instead.
+*.local.md
+NOTES.md
+WORKFLOW.md
+
 # OS / editor noise
 .DS_Store
 Thumbs.db
