@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ryan Miles</title>
+<meta name="description" content="Research and working notes on privacy-preserving architecture, zero trust, and defense systems engineering.">
+<meta property="og:title" content="Ryan Miles">
+<meta property="og:description" content="Research and working notes on privacy-preserving architecture, zero trust, and defense systems engineering.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=IBM+Plex+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,300..600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground:#e8ecf0;
+    --paper:#ffffff;
+    --ink:#0d1117;
+    --muted:#5a6675;
+    --line:#c8d0d9;
+    --accent:#12655a;
+    --accent-soft:rgba(18,101,90,.12);
+    --shadow:0 1px 0 rgba(13,17,23,.04);
+  }
+  [data-theme="dark"] {
+    --ground:#0b0e12;
+    --paper:#12161c;
+    --ink:#e6ebf0;
+    --muted:#8a96a5;
+    --line:#232a33;
+    --accent:#4fc3ae;
+    --accent-soft:rgba(79,195,174,.14);
+    --shadow:none;
+  }
+
+  *,*::before,*::after { box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    margin:0;
+    background:var(--ground);
+    color:var(--ink);
+    font-family:"Newsreader",Georgia,serif;
+    font-size:1.02rem;
+    line-height:1.6;
+    font-optical-sizing:auto;
+  }
+  a { color:inherit; }
+  ::selection { background:var(--accent-soft); }
+  :focus-visible { outline:2px solid var(--accent); outline-offset:3px; border-radius:2px; }
+
+  .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
+
+  .mono {
+    font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:.7rem;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+  }
+
+  /* ---------- masthead ---------- */
+  .top { display:flex; justify-content:space-between; align-items:center; padding:22px 0 0; gap:16px; }
+  .top .mono { color:var(--muted); }
+  .theme-btn {
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:6px 12px; border-radius:999px; cursor:pointer;
+    font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
+  }
+  .theme-btn:hover { color:var(--ink); border-color:var(--ink); }
+
+  .masthead { padding:46px 0 0; }
+  .name {
+    margin:0;
+    font-family:"Archivo",system-ui,sans-serif;
+    font-variation-settings:"wdth" 118,"wght" 700;
+    font-size:clamp(2.9rem,9vw,5.4rem);
+    line-height:.9;
+    letter-spacing:-.025em;
+  }
+  .role {
+    margin:18px 0 0;
+    max-width:56ch;
+    color:var(--muted);
+    font-size:1.06rem;
+  }
+  .role strong { color:var(--ink); font-weight:600; }
+  .contact { margin:20px 0 0; display:flex; flex-wrap:wrap; gap:8px 10px; }
+  .contact a {
+    text-decoration:none; color:var(--muted);
+    border:1px solid var(--line); border-radius:999px; padding:6px 13px;
+    font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+  }
+  .contact a:hover { color:var(--accent); border-color:var(--accent); }
+
+  /* ---------- signature: constant-rate channel ---------- */
+  .channel { margin:44px 0 8px; display:flex; gap:3px; height:11px; }
+  .slot { flex:1 1 0; background:var(--line); border-radius:1px; transition:background-color .7s ease; }
+  .slot.payload { background:var(--accent); }
+  .channel-note { color:var(--muted); font-size:.68rem; letter-spacing:.08em; text-transform:none; }
+
+  /* ---------- now ---------- */
+  .now { margin:40px 0 0; padding:22px 24px; background:var(--paper); border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow); }
+  .now h2 { margin:0 0 10px; color:var(--muted); font-weight:400; }
+  .now p { margin:0; max-width:70ch; }
+
+  /* ---------- controls ---------- */
+  .controls { margin:52px 0 0; border-top:1px solid var(--line); padding-top:22px; }
+  .bar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; }
+  .search { position:relative; flex:1 1 260px; }
+  .search input {
+    width:100%; background:var(--paper); color:var(--ink);
+    border:1px solid var(--line); border-radius:3px;
+    padding:11px 13px 11px 40px;
+    font-family:"IBM Plex Mono",monospace; font-size:.82rem;
+  }
+  .search input::placeholder { color:var(--muted); }
+  .search .key {
+    position:absolute; left:13px; top:50%; transform:translateY(-50%);
+    color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.72rem; pointer-events:none;
+  }
+  .sort select {
+    background:var(--paper); color:var(--ink); border:1px solid var(--line); border-radius:3px;
+    padding:11px 12px; font-family:"IBM Plex Mono",monospace; font-size:.72rem; letter-spacing:.06em;
+  }
+  .chips { display:flex; flex-wrap:wrap; gap:7px; margin:16px 0 0; }
+  .chip {
+    background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:5px 12px; border-radius:999px; cursor:pointer;
+    font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase;
+  }
+  .chip:hover { color:var(--ink); border-color:var(--ink); }
+  .chip[aria-pressed="true"] { background:var(--ink); border-color:var(--ink); color:var(--ground); }
+  .count { color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase; margin:18px 0 0; }
+  .count button {
+    background:none; border:none; color:var(--accent); cursor:pointer; padding:0 0 0 10px;
+    font:inherit; text-decoration:underline; text-underline-offset:3px;
+  }
+
+  /* ---------- index ---------- */
+  .index { margin:14px 0 0; border-top:1px solid var(--line); }
+  .entry {
+    display:grid; grid-template-columns:150px 1fr; gap:0 28px;
+    padding:26px 16px 26px 12px; border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .entry::before {
+    content:""; position:absolute; left:0; top:0; bottom:-1px; width:2px;
+    background:var(--accent); opacity:0; transition:opacity .18s ease;
+  }
+  .entry:hover { background:var(--paper); }
+  .entry:hover::before { opacity:1; }
+  .rail { display:flex; flex-direction:column; gap:7px; padding-top:4px; }
+  .rail .year { color:var(--ink); font-family:"IBM Plex Mono",monospace; font-size:.78rem; letter-spacing:.06em; }
+  .rail .kind { color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.13em; text-transform:uppercase; }
+  .status { display:flex; align-items:center; gap:7px; color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.64rem; letter-spacing:.11em; text-transform:uppercase; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--muted); flex:none; }
+  .status[data-status="active"] .dot { background:var(--accent); }
+  .status[data-status="published"] .dot { background:var(--ink); }
+  .status[data-status="archived"] .dot { background:transparent; border:1px solid var(--muted); }
+
+  .body h3 {
+    margin:0;
+    font-family:"Archivo",system-ui,sans-serif;
+    font-variation-settings:"wdth" 108,"wght" 600;
+    font-size:1.32rem; line-height:1.25; letter-spacing:-.01em;
+  }
+  .body h3 a { text-decoration:none; }
+  .body h3 a:hover { color:var(--accent); }
+  .body p { margin:10px 0 0; max-width:66ch; color:var(--ink); }
+  .meta { display:flex; flex-wrap:wrap; align-items:center; gap:8px; margin:14px 0 0; }
+  .tag {
+    background:none; border:none; cursor:pointer; padding:0;
+    color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.66rem; letter-spacing:.06em;
+  }
+  .tag::before { content:"#"; opacity:.5; }
+  .tag:hover { color:var(--accent); }
+  .links { display:flex; flex-wrap:wrap; gap:14px; margin:14px 0 0; }
+  .links a {
+    color:var(--accent); text-decoration:none;
+    font-family:"IBM Plex Mono",monospace; font-size:.7rem; letter-spacing:.08em; text-transform:uppercase;
+    border-bottom:1px solid var(--accent-soft); padding-bottom:2px;
+  }
+  .links a:hover { border-bottom-color:var(--accent); }
+
+  .empty { padding:56px 12px; color:var(--muted); }
+  .empty p { margin:0 0 12px; }
+
+  /* ---------- repos ---------- */
+  .repos { margin:64px 0 0; }
+  .repos[hidden] { display:none; }
+  .repos h2 { margin:0 0 16px; color:var(--muted); font-weight:400; }
+  .repo-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:12px; }
+  .repo {
+    display:block; text-decoration:none; padding:16px;
+    background:var(--paper); border:1px solid var(--line); border-radius:4px;
+  }
+  .repo:hover { border-color:var(--accent); }
+  .repo b { font-family:"IBM Plex Mono",monospace; font-size:.82rem; font-weight:500; }
+  .repo span { display:block; margin:8px 0 0; color:var(--muted); font-size:.92rem; line-height:1.45; }
+  .repo em { display:block; margin:10px 0 0; font-style:normal; color:var(--muted); font-family:"IBM Plex Mono",monospace; font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; }
+
+  footer { margin:80px 0 0; border-top:1px solid var(--line); padding:22px 0 60px; color:var(--muted); display:flex; flex-wrap:wrap; gap:10px 22px; justify-content:space-between; }
+  footer .mono { color:var(--muted); }
+
+  @media (max-width:680px) {
+    .entry { grid-template-columns:1fr; gap:12px; padding-left:14px; }
+    .rail { flex-direction:row; align-items:center; gap:14px; padding-top:0; }
+    .masthead { padding-top:34px; }
+    .now { padding:18px; }
+  }
+  @media (prefers-reduced-motion:reduce) {
+    * { animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <span class="mono">Index of work</span>
+    <button class="theme-btn" id="theme" type="button" aria-label="Switch color theme">Dark</button>
+  </header>
+
+  <section class="masthead">
+    <h1 class="name">Ryan&nbsp;Miles</h1>
+    <p class="role">
+      <strong>Program manager and doctoral researcher.</strong>
+      I build and study systems where sensitive data has to move between parties who do not fully trust each other. Encrypted inference, zero trust architecture, and the metadata problem nobody budgets for.
+    </p>
+    <nav class="contact" aria-label="Contact and profiles">
+      <a href="https://github.com/ryan-miles">GitHub</a>
+      <a href="https://www.linkedin.com/in/">LinkedIn</a>
+      <a href="https://scholar.google.com/">Scholar</a>
+      <a href="mailto:you@example.com">Email</a>
+    </nav>
+
+    <div class="channel" id="channel" aria-hidden="true"></div>
+    <p class="mono channel-note">Constant-rate channel. Every slot ships whether or not it carries payload, so the pattern tells you nothing.</p>
+  </section>
+
+  <section class="now">
+    <h2 class="mono">Now</h2>
+    <p id="now-text">
+      Finishing the IronCLAD prospectus and building the evaluation harness for encrypted inference latency. Reading on traffic analysis defenses and their real cost in bandwidth. Open to conversations about privacy-preserving architecture in regulated and classified environments.
+    </p>
+  </section>
+
+  <section class="controls" aria-label="Filter the index">
+    <div class="bar">
+      <div class="search">
+        <span class="key">/</span>
+        <label class="mono" for="q" style="position:absolute;left:-9999px">Search entries</label>
+        <input id="q" type="search" placeholder="Search titles, tags, text" autocomplete="off">
+      </div>
+      <div class="sort">
+        <label class="mono" for="sort" style="position:absolute;left:-9999px">Sort entries</label>
+        <select id="sort">
+          <option value="new">Newest first</option>
+          <option value="old">Oldest first</option>
+          <option value="az">Title A to Z</option>
+        </select>
+      </div>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Filter by type"></div>
+    <p class="count" id="count" aria-live="polite"></p>
+  </section>
+
+  <main class="index" id="index"></main>
+
+  <section class="repos" id="repos" hidden>
+    <h2 class="mono">Recent repositories</h2>
+    <div class="repo-grid" id="repo-grid"></div>
+  </section>
+
+  <footer>
+    <span class="mono">Ryan Miles</span>
+    <span class="mono">Views are my own</span>
+    <span class="mono" id="stamp"></span>
+  </footer>
+
+</div>
+
+<script>
+/* =====================================================================
+   EDIT BELOW. Everything you maintain lives in CONFIG and ENTRIES.
+
+   kind    : research | writing | project | note | talk   (add your own)
+   status  : active | draft | published | archived
+   tags    : lowercase, hyphenated
+   links   : [{ label: "Read", href: "..." }]
+
+   Optional: put the same array in a file named entries.json next to this
+   page and the site loads from there instead, so you never touch HTML
+   again to add an entry.
+   ===================================================================== */
+
+const CONFIG = {
+  githubUser: "ryan-miles",   // set to "" to hide the repositories section
+  showRepos: true
+};
+
+const ENTRIES = [
+  {
+    id: "ironclad",
+    title: "IronCLAD: privacy-preserving inspection for the defense industrial base",
+    year: 2026,
+    kind: "research",
+    status: "active",
+    blurb: "Doctoral research on a three-layer architecture: quality-inspection inference over encrypted data, telemetry aggregation under a differential privacy budget, and timing and metadata protection at the network layer. The network layer is the primary contribution, because padding and cover traffic are where the real cost lands.",
+    tags: ["homomorphic-encryption", "differential-privacy", "confidential-computing", "manufacturing"],
+    links: [{ label: "Prospectus on request", href: "mailto:you@example.com" }]
+  },
+  {
+    id: "timing-privacy",
+    title: "What constant-rate channels actually cost",
+    year: 2026,
+    kind: "note",
+    status: "draft",
+    blurb: "Traffic analysis defenses get described as solved and priced as free. Working notes on the bandwidth and latency bill for padding schemes, and where the tradeoff breaks down in bandwidth-constrained tactical networks.",
+    tags: ["traffic-analysis", "network-security", "formal-methods"],
+    links: []
+  },
+  {
+    id: "ai-decision-support",
+    title: "AI in intelligence decision support: a qualitative study",
+    year: 2026,
+    kind: "research",
+    status: "active",
+    blurb: "Interview-based study of how analysts and operators absorb AI assistance into existing decision workflows, what they trust, and what they quietly route around.",
+    tags: ["qualitative-methods", "human-ai-teaming", "decision-support"],
+    links: []
+  },
+  {
+    id: "zero-trust",
+    title: "Zero trust past the marketing",
+    year: 2025,
+    kind: "writing",
+    status: "draft",
+    blurb: "Zero trust became a procurement checkbox before it became an architecture. An attempt to separate the parts with real engineering content from the parts sold by the slide.",
+    tags: ["zero-trust", "architecture"],
+    links: []
+  },
+  {
+    id: "vpx-sosa",
+    title: "Reading notes: VPX, SOSA, and modular open systems",
+    year: 2025,
+    kind: "note",
+    status: "active",
+    blurb: "Running notes on the tactical backplane ecosystem, how the standards stack fits together, and what modularity buys once integration cost is counted honestly.",
+    tags: ["hardware", "open-standards"],
+    links: []
+  }
+];
+
+/* ===================== nothing below needs editing ===================== */
+
+const KIND_ORDER = ["research", "writing", "project", "note", "talk"];
+const state = { q: "", kind: "all", tag: "", sort: "new" };
+let data = ENTRIES;
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------- theme ---------- */
+const root = document.documentElement;
+const themeBtn = $("#theme");
+function setTheme(mode) {
+  root.setAttribute("data-theme", mode);
+  themeBtn.textContent = mode === "dark" ? "Light" : "Dark";
+}
+setTheme(window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+themeBtn.addEventListener("click", () => {
+  setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+});
+
+/* ---------- constant-rate channel ---------- */
+const SLOTS = 56;
+const channel = $("#channel");
+for (let i = 0; i < SLOTS; i++) {
+  const el = document.createElement("i");
+  el.className = "slot";
+  channel.appendChild(el);
+}
+const slots = [...channel.children];
+function paint() {
+  const live = new Set();
+  while (live.size < 7) live.add(Math.floor(Math.random() * SLOTS));
+  slots.forEach((s, i) => s.classList.toggle("payload", live.has(i)));
+}
+paint();
+if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  setInterval(paint, 2600);
+}
+
+/* ---------- hash routing ---------- */
+function readHash() {
+  const raw = location.hash.replace(/^#/, "");
+  if (!raw) return;
+  const p = new URLSearchParams(raw);
+  state.kind = p.get("kind") || "all";
+  state.tag = p.get("tag") || "";
+  state.q = p.get("q") || "";
+  state.sort = p.get("sort") || "new";
+  $("#q").value = state.q;
+  $("#sort").value = state.sort;
+}
+function writeHash() {
+  const p = new URLSearchParams();
+  if (state.kind !== "all") p.set("kind", state.kind);
+  if (state.tag) p.set("tag", state.tag);
+  if (state.q) p.set("q", state.q);
+  if (state.sort !== "new") p.set("sort", state.sort);
+  const s = p.toString();
+  history.replaceState(null, "", s ? "#" + s : location.pathname);
+}
+
+/* ---------- filtering ---------- */
+function visible() {
+  const q = state.q.trim().toLowerCase();
+  return data
+    .filter((e) => state.kind === "all" || e.kind === state.kind)
+    .filter((e) => !state.tag || (e.tags || []).includes(state.tag))
+    .filter((e) => {
+      if (!q) return true;
+      const hay = [e.title, e.blurb, e.kind, e.status, (e.tags || []).join(" ")].join(" ").toLowerCase();
+      return q.split(/\s+/).every((w) => hay.includes(w));
+    })
+    .sort((a, b) => {
+      if (state.sort === "az") return a.title.localeCompare(b.title);
+      if (state.sort === "old") return a.year - b.year || a.title.localeCompare(b.title);
+      return b.year - a.year || a.title.localeCompare(b.title);
+    });
+}
+
+/* ---------- rendering ---------- */
+function renderChips() {
+  const counts = {};
+  data.forEach((e) => { counts[e.kind] = (counts[e.kind] || 0) + 1; });
+  const kinds = Object.keys(counts).sort((a, b) => {
+    const ia = KIND_ORDER.indexOf(a), ib = KIND_ORDER.indexOf(b);
+    return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+  });
+  $("#chips").innerHTML =
+    [["all", "All " + data.length]].concat(kinds.map((k) => [k, k + " " + counts[k]]))
+      .map(([val, label]) =>
+        `<button class="chip" type="button" data-kind="${esc(val)}" aria-pressed="${state.kind === val}">${esc(label)}</button>`
+      ).join("");
+}
+
+function renderIndex() {
+  const rows = visible();
+  const filtered = state.kind !== "all" || state.tag || state.q;
+  $("#count").innerHTML =
+    `${rows.length} of ${data.length} entries` +
+    (state.tag ? ` filtered by #${esc(state.tag)}` : "") +
+    (filtered ? `<button type="button" id="clear">Clear filters</button>` : "");
+
+  if (!rows.length) {
+    $("#index").innerHTML = `<div class="empty"><p>No entries match those filters.</p><p class="mono"><button class="chip" type="button" data-kind="all">Show everything</button></p></div>`;
+    return;
+  }
+
+  $("#index").innerHTML = rows.map((e) => `
+    <article class="entry" id="${esc(e.id)}">
+      <div class="rail">
+        <span class="year">${esc(e.year)}</span>
+        <span class="kind">${esc(e.kind)}</span>
+        <span class="status" data-status="${esc(e.status)}"><i class="dot"></i>${esc(e.status)}</span>
+      </div>
+      <div class="body">
+        <h3><a href="#${esc(e.id)}">${esc(e.title)}</a></h3>
+        <p>${esc(e.blurb)}</p>
+        ${(e.tags || []).length ? `<div class="meta">${e.tags.map((t) => `<button class="tag" type="button" data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}
+        ${(e.links || []).length ? `<div class="links">${e.links.map((l) => `<a href="${esc(l.href)}">${esc(l.label)}</a>`).join("")}</div>` : ""}
+      </div>
+    </article>`).join("");
+}
+
+function render() {
+  renderChips();
+  renderIndex();
+  writeHash();
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", (ev) => {
+  const chip = ev.target.closest("[data-kind]");
+  if (chip) {
+    state.kind = chip.dataset.kind;
+    if (state.kind === "all") state.tag = "";
+    render();
+    return;
+  }
+  const tag = ev.target.closest("[data-tag]");
+  if (tag) {
+    state.tag = state.tag === tag.dataset.tag ? "" : tag.dataset.tag;
+    render();
+    return;
+  }
+  if (ev.target.id === "clear") {
+    state.kind = "all"; state.tag = ""; state.q = ""; $("#q").value = "";
+    render();
+  }
+});
+
+$("#q").addEventListener("input", (ev) => { state.q = ev.target.value; renderIndex(); writeHash(); });
+$("#sort").addEventListener("change", (ev) => { state.sort = ev.target.value; renderIndex(); writeHash(); });
+
+document.addEventListener("keydown", (ev) => {
+  if (ev.key === "/" && document.activeElement !== $("#q")) { ev.preventDefault(); $("#q").focus(); }
+  if (ev.key === "Escape" && document.activeElement === $("#q")) { state.q = ""; $("#q").value = ""; render(); $("#q").blur(); }
+});
+
+/* ---------- optional external entries.json ---------- */
+async function loadEntries() {
+  try {
+    const res = await fetch("entries.json", { cache: "no-store" });
+    if (!res.ok) return;
+    const json = await res.json();
+    if (Array.isArray(json) && json.length) { data = json; render(); }
+  } catch (err) { /* inline ENTRIES stay in use */ }
+}
+
+/* ---------- optional GitHub repositories ---------- */
+async function loadRepos() {
+  if (!CONFIG.showRepos || !CONFIG.githubUser) return;
+  try {
+    const res = await fetch(`https://api.github.com/users/${CONFIG.githubUser}/repos?sort=updated&per_page=6`);
+    if (!res.ok) return;
+    const repos = (await res.json()).filter((r) => !r.fork);
+    if (!repos.length) return;
+    $("#repo-grid").innerHTML = repos.map((r) => `
+      <a class="repo" href="${esc(r.html_url)}">
+        <b>${esc(r.name)}</b>
+        <span>${esc(r.description || "No description yet.")}</span>
+        <em>${esc(r.language || "text")} &middot; updated ${new Date(r.updated_at).toLocaleDateString("en-US", { month: "short", year: "numeric" })}</em>
+      </a>`).join("");
+    $("#repos").hidden = false;
+  } catch (err) { /* section stays hidden */ }
+}
+
+/* ---------- boot ---------- */
+readHash();
+render();
+$("#stamp").textContent = "Updated " + new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" });
+loadEntries();
+loadRepos();
+</script>
+</body>
+</html>
