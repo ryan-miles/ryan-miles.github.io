@@ -60,12 +60,42 @@
   /* ---------- masthead ---------- */
   .top { display:flex; justify-content:space-between; align-items:center; padding:22px 0 0; gap:16px; }
   .top .mono { color:var(--muted); }
+  .top-actions { display:flex; align-items:center; gap:8px; }
   .theme-btn {
     background:transparent; border:1px solid var(--line); color:var(--muted);
     padding:6px 12px; border-radius:999px; cursor:pointer;
     font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
   }
   .theme-btn:hover { color:var(--ink); border-color:var(--ink); }
+
+  /* ---------- projects menu ---------- */
+  .projects-menu { position:relative; }
+  .projects-menu summary { list-style:none; }
+  .projects-menu summary::-webkit-details-marker { display:none; }
+  .projects-menu summary::marker { content:""; }
+  .projects-toggle {
+    display:flex; align-items:center; gap:8px; background:transparent; border:1px solid var(--line); color:var(--muted);
+    padding:6px 12px; border-radius:999px; cursor:pointer;
+    font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.12em; text-transform:uppercase;
+  }
+  .projects-toggle:hover, .projects-menu[open] .projects-toggle { color:var(--accent); border-color:var(--accent); }
+  .projects-toggle::after { content:"+"; color:var(--accent); font-size:.9rem; line-height:.7; }
+  .projects-menu[open] .projects-toggle::after { content:"−"; }
+  .project-count { color:var(--accent); }
+  .projects-popover {
+    position:absolute; z-index:2; right:0; top:calc(100% + 10px); width:min(350px,calc(100vw - 48px));
+    padding:12px; background:var(--paper); border:1px solid var(--line); border-radius:4px; box-shadow:0 12px 30px rgba(13,17,23,.13);
+  }
+  [data-theme="dark"] .projects-popover { box-shadow:0 12px 30px rgba(0,0,0,.32); }
+  .projects-popover p { margin:0 0 10px; color:var(--muted); }
+  .project-menu { display:grid; gap:6px; }
+  .project-menu-item { display:block; padding:13px; border:1px solid transparent; border-radius:3px; color:inherit; text-decoration:none; }
+  .project-menu-item:hover { background:var(--accent-soft); border-color:var(--accent); }
+  .project-menu-type, .project-menu-launch { display:block; font-family:"IBM Plex Mono",monospace; font-size:.63rem; letter-spacing:.1em; text-transform:uppercase; }
+  .project-menu-type { color:var(--muted); }
+  .project-menu-item b { display:block; margin:5px 0 0; font-family:"Archivo",system-ui,sans-serif; font-variation-settings:"wdth" 108,"wght" 600; font-size:1rem; }
+  .project-menu-item span:not(.project-menu-type):not(.project-menu-launch) { display:block; margin:5px 0 0; color:var(--muted); font-size:.86rem; line-height:1.4; }
+  .project-menu-launch { margin:10px 0 0; color:var(--accent); }
 
   .masthead { padding:46px 0 0; }
   .name {
@@ -101,32 +131,6 @@
   .now { margin:40px 0 0; padding:22px 24px; background:var(--paper); border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow); }
   .now h2 { margin:0 0 10px; color:var(--muted); font-weight:400; }
   .now p { margin:0; max-width:70ch; }
-
-  /* ---------- projects ---------- */
-  .projects { margin:52px 0 0; }
-  .projects-heading { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px 24px; align-items:baseline; margin:0 0 16px; }
-  .projects h2 { margin:0; color:var(--muted); font-weight:400; }
-  .projects-heading p { margin:0; color:var(--muted); font-size:.92rem; }
-  .project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
-  .project {
-    display:flex; flex-direction:column; min-height:220px; padding:24px;
-    background:var(--paper); border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow);
-  }
-  .project:hover { border-color:var(--accent); }
-  .project-kicker { color:var(--accent); }
-  .project h3 {
-    margin:12px 0 0; font-family:"Archivo",system-ui,sans-serif;
-    font-variation-settings:"wdth" 108,"wght" 600; font-size:1.5rem; line-height:1.15; letter-spacing:-.015em;
-  }
-  .project p { margin:12px 0 0; max-width:58ch; color:var(--muted); }
-  .project-actions { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 0; }
-  .project-action {
-    display:inline-flex; align-items:center; min-height:38px; padding:8px 12px; border-radius:3px;
-    background:var(--accent); border:1px solid var(--accent); color:var(--paper); text-decoration:none;
-    font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
-  }
-  .project-action:hover { filter:brightness(.92); }
-  .project-action.secondary { background:transparent; color:var(--accent); }
 
   /* ---------- controls ---------- */
   .controls { margin:52px 0 0; border-top:1px solid var(--line); padding-top:22px; }
@@ -228,6 +232,9 @@
   footer .mono { color:var(--muted); }
 
   @media (max-width:680px) {
+    .top { align-items:flex-start; }
+    .top-actions { gap:6px; }
+    .projects-toggle, .theme-btn { padding:6px 9px; }
     .entry { grid-template-columns:1fr; gap:12px; padding-left:14px; }
     .rail { flex-direction:row; align-items:center; gap:14px; padding-top:0; }
     .masthead { padding-top:34px; }
@@ -243,7 +250,16 @@
 
   <header class="top">
     <span class="mono">Index of work</span>
-    <button class="theme-btn" id="theme" type="button" aria-label="Switch color theme">Dark</button>
+    <div class="top-actions">
+      <details class="projects-menu">
+        <summary class="projects-toggle" aria-label="Open projects menu">Projects <span class="project-count" id="project-count"></span></summary>
+        <nav class="projects-popover" aria-label="Projects">
+          <p class="mono">Tools and experiments</p>
+          <div class="project-menu" id="project-menu"></div>
+        </nav>
+      </details>
+      <button class="theme-btn" id="theme" type="button" aria-label="Switch color theme">Dark</button>
+    </div>
   </header>
 
   <section class="masthead">
@@ -267,14 +283,6 @@
     <p id="now-text">
       Standing up the feasibility testbed behind my dissertation and writing up the parts of it worth explaining in plain language. Reading on traffic analysis defenses and what they cost in bandwidth and latency. Open to conversations about privacy-preserving architecture in regulated and controlled environments.
     </p>
-  </section>
-
-  <section class="projects" aria-labelledby="projects-title">
-    <div class="projects-heading">
-      <h2 class="mono" id="projects-title">Projects</h2>
-      <p>Useful tools and experiments, ready to use.</p>
-    </div>
-    <div class="project-grid" id="project-grid"></div>
   </section>
 
   <section class="controls" aria-label="Filter the index">
@@ -574,16 +582,14 @@ function renderIndex() {
 }
 
 function renderProjects() {
-  $("#project-grid").innerHTML = PROJECTS.map((project) => `
-    <article class="project">
-      <span class="mono project-kicker">${esc(project.type || "Project")}</span>
-      <h3>${esc(project.title)}</h3>
-      <p>${esc(project.blurb)}</p>
-      <div class="project-actions">
-        <a class="project-action" href="${esc(project.href)}">${esc(project.action || "Open project")} <span aria-hidden="true">&rarr;</span></a>
-        ${(project.links || []).map((link) => `<a class="project-action secondary" href="${esc(link.href)}">${esc(link.label)}</a>`).join("")}
-      </div>
-    </article>`).join("");
+  $("#project-count").textContent = String(PROJECTS.length);
+  $("#project-menu").innerHTML = PROJECTS.map((project) => `
+    <a class="project-menu-item" href="${esc(project.href)}">
+      <span class="project-menu-type">${esc(project.type || "Project")}</span>
+      <b>${esc(project.title)}</b>
+      <span>${esc(project.blurb)}</span>
+      <span class="project-menu-launch">${esc(project.action || "Open project")} &rarr;</span>
+    </a>`).join("");
 }
 
 function render() {
