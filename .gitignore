@@ -1,0 +1,10 @@
+# mermaid-studio/ is its own git repo (github.com/ryan-miles/mermaid-studio),
+# nested here only for convenience. It must stay ignored: without this entry a
+# `git add -A` would commit it as an embedded gitlink — a grey stub folder on
+# GitHub holding none of the actual files. See README.md.
+mermaid-studio/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
