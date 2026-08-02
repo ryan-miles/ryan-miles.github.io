@@ -102,32 +102,6 @@
   .now h2 { margin:0 0 10px; color:var(--muted); font-weight:400; }
   .now p { margin:0; max-width:70ch; }
 
-  /* ---------- projects ---------- */
-  .projects { margin:52px 0 0; }
-  .projects-heading { display:flex; flex-wrap:wrap; justify-content:space-between; gap:10px 24px; align-items:baseline; margin:0 0 16px; }
-  .projects h2 { margin:0; color:var(--muted); font-weight:400; }
-  .projects-heading p { margin:0; color:var(--muted); font-size:.92rem; }
-  .project-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:12px; }
-  .project {
-    display:flex; flex-direction:column; min-height:220px; padding:24px;
-    background:var(--paper); border:1px solid var(--line); border-radius:4px; box-shadow:var(--shadow);
-  }
-  .project:hover { border-color:var(--accent); }
-  .project-kicker { color:var(--accent); }
-  .project h3 {
-    margin:12px 0 0; font-family:"Archivo",system-ui,sans-serif;
-    font-variation-settings:"wdth" 108,"wght" 600; font-size:1.5rem; line-height:1.15; letter-spacing:-.015em;
-  }
-  .project p { margin:12px 0 0; max-width:58ch; color:var(--muted); }
-  .project-actions { display:flex; flex-wrap:wrap; gap:10px; margin:22px 0 0; }
-  .project-action {
-    display:inline-flex; align-items:center; min-height:38px; padding:8px 12px; border-radius:3px;
-    background:var(--accent); border:1px solid var(--accent); color:var(--paper); text-decoration:none;
-    font-family:"IBM Plex Mono",monospace; font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
-  }
-  .project-action:hover { filter:brightness(.92); }
-  .project-action.secondary { background:transparent; color:var(--accent); }
-
   /* ---------- controls ---------- */
   .controls { margin:52px 0 0; border-top:1px solid var(--line); padding-top:22px; }
   .bar { display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between; }
@@ -249,7 +223,7 @@
   <section class="masthead">
     <h1 class="name">Ryan&nbsp;Miles</h1>
     <p class="role">
-      <strong>Technical Leader and Doctoral Researcher.</strong>
+      <strong>Technical Leader and Coctoral Researcher.</strong>
       I build and study systems where sensitive data has to move between parties who do not fully trust each other. Encrypted inference, zero trust architecture, and the metadata problem nobody budgets for.
     </p>
     <nav class="contact" aria-label="Contact and profiles">
@@ -267,14 +241,6 @@
     <p id="now-text">
       Standing up the feasibility testbed behind my dissertation and writing up the parts of it worth explaining in plain language. Reading on traffic analysis defenses and what they cost in bandwidth and latency. Open to conversations about privacy-preserving architecture in regulated and controlled environments.
     </p>
-  </section>
-
-  <section class="projects" aria-labelledby="projects-title">
-    <div class="projects-heading">
-      <h2 class="mono" id="projects-title">Projects</h2>
-      <p>Useful tools and experiments, ready to use.</p>
-    </div>
-    <div class="project-grid" id="project-grid"></div>
   </section>
 
   <section class="controls" aria-label="Filter the index">
@@ -330,17 +296,6 @@ const CONFIG = {
   githubUser: "ryan-miles",   // set to "" to hide the repositories section
   showRepos: true
 };
-
-const PROJECTS = [
-  {
-    title: "Open-Source Mermaid Editor",
-    type: "Diagramming tool",
-    blurb: "Create, preview, and export Mermaid diagrams in your browser. No account or installation required.",
-    href: "https://ryan-miles.github.io/open-source-mermaid-editor/",
-    action: "Open editor",
-    links: [{ label: "View source", href: "https://github.com/ryan-miles/open-source-mermaid-editor" }]
-  }
-];
 
 const ENTRIES = [
   {
@@ -573,21 +528,7 @@ function renderIndex() {
     </article>`).join("");
 }
 
-function renderProjects() {
-  $("#project-grid").innerHTML = PROJECTS.map((project) => `
-    <article class="project">
-      <span class="mono project-kicker">${esc(project.type || "Project")}</span>
-      <h3>${esc(project.title)}</h3>
-      <p>${esc(project.blurb)}</p>
-      <div class="project-actions">
-        <a class="project-action" href="${esc(project.href)}">${esc(project.action || "Open project")} <span aria-hidden="true">&rarr;</span></a>
-        ${(project.links || []).map((link) => `<a class="project-action secondary" href="${esc(link.href)}">${esc(link.label)}</a>`).join("")}
-      </div>
-    </article>`).join("");
-}
-
 function render() {
-  renderProjects();
   renderChips();
   renderIndex();
   writeHash();
