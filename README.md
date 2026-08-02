@@ -1,76 +1,53 @@
 # ryan-miles.github.io
 
-Personal site, plus project sites nested underneath it for convenience.
+My personal site. Live at **https://ryan-miles.github.io/**
 
-Live: **https://ryan-miles.github.io/**
+This repo contains the homepage and nothing else — `index.html` is the whole
+site. Pages serves it in *legacy* mode (branch `main`, root), so whatever is
+committed here is what goes live. There is no build step.
 
-## Folder layout
+## Where the project sites live
 
-```
-OneDrive/ryan-miles.github.io/     <-- git repo A  (this repo)
-├── .git/
-├── .gitignore                     ignores mermaid-studio/
-├── index.html                     the homepage itself
-├── README.md                      this file
-└── mermaid-studio/                <-- git repo B  (SEPARATE repo, ignored here)
-    ├── .git/                          its own history and remote
-    ├── .github/workflows/deploy.yml   its own auto-deploy
-    ├── src/
-    └── README.md
-```
+Sites like **https://ryan-miles.github.io/mermaid-studio/** are *not* in this
+repo and are not built from it. Each is its own repository with its own deploy.
 
-## Two repos, not one
-
-They live in the same folder tree but are completely independent. Nothing is
-shared — not history, not remotes, not deploys.
-
-| Folder | GitHub repo | Pages mode | Live URL |
+| URL | Repo | Local path | Pages mode |
 |---|---|---|---|
-| `.` | [ryan-miles.github.io](https://github.com/ryan-miles/ryan-miles.github.io) | legacy — branch `main`, root | https://ryan-miles.github.io/ |
-| `mermaid-studio/` | [mermaid-studio](https://github.com/ryan-miles/mermaid-studio) | GitHub Actions workflow | https://ryan-miles.github.io/mermaid-studio/ |
+| https://ryan-miles.github.io/ | `ryan-miles.github.io` (this one) | `~/OneDrive/ryan-miles.github.io/` | legacy, branch `main` |
+| https://ryan-miles.github.io/mermaid-studio/ | [`mermaid-studio`](https://github.com/ryan-miles/mermaid-studio) | `~/Developer/mermaid-studio/` | GitHub Actions |
 
-The two URLs nest, but that is a GitHub Pages routing rule, not a consequence of
-the folder nesting: a **user site** (`<user>.github.io`) is served at the domain
-root, and every **project site** is served at `/<repo-name>/`. `mermaid-studio`
-would resolve to that same URL no matter where its folder sat on disk.
+The URLs nest, but that is a GitHub Pages routing rule, not a folder
+relationship: a **user site** (`<user>.github.io`) is served at the domain root,
+and every **project site** is served at `/<repo-name>/`, wherever its folder
+happens to sit on disk.
 
-## Working on each
+## Local layout
 
-Git commands apply to whichever repo you are standing in. From this folder you
-are in repo A; `cd mermaid-studio` puts you in repo B.
+Code projects live outside OneDrive, one repo per folder:
 
-```bash
-# homepage
-cd ~/OneDrive/ryan-miles.github.io
-git add index.html && git commit -m "..." && git push     # live in ~1 min
+```
+~/Developer/                  <- all code repos
+├── mermaid-studio/
+└── browser-harness/
 
-# the app
-cd ~/OneDrive/ryan-miles.github.io/mermaid-studio
-npm run dev                                               # local preview
-git add -A && git commit -m "..." && git push             # Actions builds + deploys
+~/OneDrive/ryan-miles.github.io/    <- this repo (homepage only)
 ```
 
-### Do not `git add` mermaid-studio/ from this repo
+Keeping repos out of OneDrive avoids syncing `node_modules` — roughly 9,000
+files for a single Vite project — which competes with real document sync and can
+hold file locks. GitHub is the backup for this code, not OneDrive.
 
-It is in `.gitignore` for a real reason. Git refuses to store a nested repo's
-files in an outer repo; it stores a *gitlink* — a bare pointer to a commit SHA.
-The result looks fine locally but appears on GitHub as an empty grey folder you
-cannot open, and the files are not actually backed up by this repo.
+Projects are deliberately **not** nested inside this repo. Git cannot store a
+nested repo's files in an outer repo; it stores a *gitlink*, a bare commit
+pointer that appears on GitHub as an empty grey folder holding none of the
+actual files. Separate folders avoid that failure mode entirely.
 
-If it ever gets added by accident:
+## Adding a new project site
 
-```bash
-git rm --cached mermaid-studio        # no -r; drops the gitlink, keeps the files
-```
-
-The correct place to back up the app is its own remote, by pushing from inside
-`mermaid-studio/`.
-
-## Deploy behaviour differs between the two
-
-- **This repo** uses legacy Pages: whatever is committed to `main` at the root is
-  what gets served. There is no build step.
-- **mermaid-studio** builds from source via Actions (`.github/workflows/deploy.yml`)
-  and publishes `dist-web/`. Build output is gitignored there — never commit it.
-
-So a broken build in one cannot take down the other.
+1. `git init` it in `~/Developer/<name>/` and push to a GitHub repo of the same name.
+2. Give it a Pages deploy (see `mermaid-studio/.github/workflows/deploy.yml` for a
+   working Actions example). Enable Pages on the repo first — Settings → Pages →
+   Source: **GitHub Actions** — because a workflow's `GITHUB_TOKEN` can configure
+   an existing Pages site but cannot create one.
+3. It appears at `https://ryan-miles.github.io/<name>/` automatically. Nothing in
+   this repo needs to change.
